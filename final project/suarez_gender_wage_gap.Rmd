@@ -1,0 +1,50 @@
+---
+title: "inst_627_suarez_final"
+output: html_document
+date: "2023-11-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+Research Questions:
+1. How does the gender pay disparity vary by race, age and education?
+2. Which industries have the most and least significant wage discrepancies?
+3. At what rate do men and women participate in the workforce?
+4. (Potential) Highlight major policies or economic events that have contributed or shaped these trends.
+
+
+
+2. Which industries have the most and least significant wage discrepancies?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
