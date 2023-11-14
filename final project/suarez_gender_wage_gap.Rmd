@@ -1,23 +1,35 @@
 ---
 title: "inst_627_suarez_final"
 output: html_document
-date: "2023-11-13"
+date: "2023-11-7"
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This is the R Markdown file for Pablo Suarez's final project in INST627: DATA ANALYTICS FOR INFORMATION PROFESSIONALS.
+This is the R Markdown file for Pablo Suarez's final project in INST627: Data Analytics for Information Professionals.
 
-In this file, I am analyzing gender pay disparities in the United States. As mentioned in my project proposal, this is an issue that has persisted for decades despite intervention from legislators and recognition among the general public. U.S. Census data suggests that it wasn’t until 1990 that women reached a threshold of earning 70 cents to every dollar earned by men. Almost 30 years later, the gap has closed to roughly 84 cents for every dollar men earn. 
+In this file, I am analyzing gender pay disparities in the United States.
+As mentioned in my project proposal, this is an issue that has persisted for decades despite intervention from legislators and recognition among the general public.
+U.S.
+Census data suggests that it wasn't until 1990 that women reached a threshold of earning 70 cents to every dollar earned by men.
+Almost 30 years later, the gap has closed to roughly 84 cents for every dollar men earn.
 
 To better understand this issue, I would like to answer the following research questions: 
-1. How does the gender pay disparity vary by race, age and education?
-2. Which industries have the most and least significant wage discrepancies?
-3. At what rate do men and women participate in the workforce?
-4. (Potential) Highlight major policies or economic events that have contributed or shaped these trends.
+1.How does the gender pay disparity vary by race, age and education?
+2.Which industries have the most and least significant wage discrepancies?
+3.At what rate do men and women participate in the workforce?
 
+As I've worked on this project, I've also considered adding the following visualization tasks.
+These are things that I'd like to work on depending on whether I have enough time before the project deadline: 
+1.(Potential) Highlight major policies or economic events that have contributed or shaped these trends.
+2.(Potential) Create an interactive map of the United States highlighting the difference by state in annual earnings between genders.
+
+To begin the project, I loaded in libraries that I felt would be useful toward what I wanted to accomplish.
 
 ```{r}
 # Turn off scientific notation
@@ -34,12 +46,76 @@ library(ggthemes)
 library(ggplot2)
 ```
 
+***1. How does the gender pay disparity vary by race, age and education?***
+
+To begin working on answering this first question, I called in data from the Economic Policy Institute's State of Working America Data Library.
+For the purposes of this project, I'm only focusing on male and female genders.
+
+```{r}
+
+gender_wage_gap <- read_csv("data/gender_wage_gap.csv")
+
+```
+
+The first step I took was to establish a historical baseline which included calculating the difference between the 1973 and 2022 values for median and average hourly wages by men and women.
+Based on this data, since 1973, men have seen their average salary increase by \$8.86 and women by \$10.55.
+The difference in median hourly salary for men over the years is less dramatic.
+Male median hourly wages increased by \$0.91, while women increased by \$5.64.
+
+Despite women seeing a greater increase in average and median hourly wages, it is a moot point when acknowledging that the difference in wages between genders has persisted over time.
+For example, men in 1973 had an average hourly salary of \$26.96, while women had an average of \$17.31, for a difference of \$9.65.
+In 2022, men had an average hourly salary of \$35.82, while women earned \$27.86, for a difference of \$7.96.
+These findings demonstrate that while hourly wages have increased over time, little progress has been made over five decades to close the gap between men and women.
+
+It's worth mentioning that the 2020 hourly wages were the highest in the data set, however, preferred to use the most recent earnings to preserve accuracy and because economic fluctuation is to be expected when dealing with financial data.
+
+```{r}
+
+gender_wage_gap |>
+  summarise(
+    men_avg_diff = gender_wage_gap$men_average[1] - gender_wage_gap$men_average[50],
+    men_median_diff = gender_wage_gap$men_median[1] - gender_wage_gap$men_median[50],
+    women_avg_diff = gender_wage_gap$women_average[1] - gender_wage_gap$women_average[50],
+    women_median_diff = gender_wage_gap$women_median[1] - gender_wage_gap$women_median[50],
+    mw_avg_2022 = gender_wage_gap$men_average[1] - gender_wage_gap$women_average[1],
+    mw_avg_1973 = gender_wage_gap$men_average[50] - gender_wage_gap$women_average[50],
+    mw_med_2022 = gender_wage_gap$men_median[1] - gender_wage_gap$women_median[1],
+    mw_med_1973 = gender_wage_gap$men_median[50] - gender_wage_gap$women_median[50]
+    )
+
+```
+
+Next, I followed a similar workflow for average hourly wages among genders by race.
+
+```{r}
+gender_wage_gap |>
+  summarise(
+    women_avg_diff = gender_wage_gap$women_average[1] - gender_wage_gap$women_average[50])
+
+```
+
+To determine how age might factor into the gender pay gap, I cleaned up a data frame from the U.S.
+Bureau of Labor Statistics showing the inflation-adjusted median of usual weekly earnings, by age groups, for full-time wage and salary workers between 1979 and 2020.
+The original data can be found on table 17 of the Sept. 2021 report from the BLS (<https://www.bls.gov/opub/reports/womens-earnings/2020/home.html>).
+
+```{r}
+
+median_weekly_earnings_age <- read_csv("data/median_weekly_earnings_age.csv") |>
+clean_names()
+
+view(median_weekly_earnings_age)
 
 
+```
 
+***2. Which industries have the most and least significant wage discrepancies?***
 
+To answer this question, I merged two data frames from the U.S.
+Department of Labor into one featuring 50 industries and professions with the highest and lowest wage disparities by gender.
+This disparity was measured with women's earnings as a percentage of men's earnings.
 
-2. Which industries have the most and least significant wage discrepancies?
+I then uploaded the merged data frame to Datawrapper and visualized the results.
+Datawrapper Link: <https://datawrapper.dwcdn.net/HJ514/1/>
 
 ```{r}
 
@@ -52,8 +128,10 @@ largest_industry_gaps |>
   arrange(desc(`Women's Earnings as a Percentage of Men's Earnings`)) |>
   clean_names()
 
+write_csv(industry_gaps, "data/industry_gaps.csv")
 ```
 
+```{r}
 
 
 
@@ -61,18 +139,4 @@ largest_industry_gaps |>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
