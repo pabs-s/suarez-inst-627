@@ -19,14 +19,12 @@ U.S.
 Census data suggests that it wasn't until 1990 that women reached a threshold of earning 70 cents to every dollar earned by men.
 Almost 30 years later, the gap has closed to roughly 84 cents for every dollar men earn.
 
-To better understand this issue, I would like to answer the following research questions: 
-1.How does the gender pay disparity vary by race, age and education?
+To better understand this issue, I would like to answer the following research questions: 1.How does the gender pay disparity vary by race, age and education?
 2.Which industries have the most and least significant wage discrepancies?
 3.At what rate do men and women participate in the workforce?
 
 As I've worked on this project, I've also considered adding the following visualization tasks.
-These are things that I'd like to work on depending on whether I have enough time before the project deadline: 
-1.(Potential) Highlight major policies or economic events that have contributed or shaped these trends.
+These are things that I'd like to work on depending on whether I have enough time before the project deadline: 1.(Potential) Highlight major policies or economic events that have contributed or shaped these trends.
 2.(Potential) Create an interactive map of the United States highlighting the difference by state in annual earnings between genders.
 
 To begin the project, I loaded in libraries that I felt would be useful toward what I wanted to accomplish.
@@ -85,25 +83,87 @@ gender_wage_gap |>
 
 ```
 
-Next, I followed a similar workflow for average hourly wages among genders by race.
+Next, I followed a similar workflow for average hourly wages among genders by race. This data set examines white, Black and Hispanic men and women, specifically.
+
+White Men and Women:
+
+Between 1973 and 2022, the average hourly wages of white men have increased by \$11.17 and by \$11.93 for women.
+The hourly wage gap between white men and women in 1973 was \$10.36 and is now \$9.60, a difference of \$0.76 signifying that little has changed over time.
+
+I calculated the difference between white women and men overall in 2022, which is \-$6.32, suggesting that white women earn that amount less than men overall. I also found the difference between white women and women overall, which equaled \$1.64, signifying that white women have higher average hourly wages compared to the average for the entire gender.
 
 ```{r}
+
 gender_wage_gap |>
   summarise(
-    women_avg_diff = gender_wage_gap$women_average[1] - gender_wage_gap$women_average[50])
+    white_men_avg_diff = gender_wage_gap$white_men_average[1] - gender_wage_gap$white_men_average[50],
+    white_women_avg_diff = gender_wage_gap$white_women_average[1] - gender_wage_gap$white_women_average[50],
+    whitemw_avg_2022 = gender_wage_gap$white_men_average[1] - gender_wage_gap$white_women_average[1],
+    whitemw_avg_1973 = gender_wage_gap$white_men_average[50] - gender_wage_gap$white_women_average[50],
+    wwomenvsmen2022 = gender_wage_gap$white_women_average[1] - gender_wage_gap$men_average[1],
+    wwomenvswomen2022 = gender_wage_gap$white_women_average[1] - gender_wage_gap$women_average[1])
+
+```
+Black Men and Women:
+
+Between 1973 and 2022, the average hourly wages of Black men have increased by \$6.34 and by \$8.16 for women.
+The hourly wage gap between Black men and women in 1973 was \$5.26 and is now \$3.44, a difference of \$1.82, which is greater than the difference between white men and women. 
+
+The difference between Black women and men overall in 2022, which is \-$11.83, suggesting that Black women earn that amount less than men overall. I also found the difference between Black women and women overall, which equaled \-$3.87, signifying the hourly average amount less that Black women earned compared to the entire gender.
+
+```{r}
+
+gender_wage_gap |>
+  summarise(
+    black_men_avg_diff = gender_wage_gap$black_men_average[1] - gender_wage_gap$black_men_average[50],
+    black_women_avg_diff = gender_wage_gap$black_women_average[1] - gender_wage_gap$black_women_average[50],
+    blackmw_avg_2022 = gender_wage_gap$black_men_average[1] - gender_wage_gap$black_women_average[1],
+    blackmw_avg_1973 = gender_wage_gap$black_men_average[50] - gender_wage_gap$black_women_average[50],
+    bwomenvsmen2022 = gender_wage_gap$black_women_average[1] - gender_wage_gap$men_average[1],
+    bwomenvswomen2022 = gender_wage_gap$black_women_average[1] - gender_wage_gap$women_average[1])
+
+```
+
+Hispanic Men and Women:
+
+Between 1973 and 2022, the average hourly wages of Hispanic men have increased by \$5.96 and by \$7.21 for women.
+The hourly wage gap between Hispanic men and women in 1973 was \$5.28 and is now \$4.03, a difference of \$1.25, the lowest difference among all of the races that I observed. 
+
+The difference between Hispanic women and men overall in 2022, which is \-$13.22, the largest observed margin. The difference between Black women and women overall equaled \-$5.26, signifying the hourly average amount less that Hispanic women earned compared to the entire gender.
+
+```{r}
+
+gender_wage_gap |>
+  summarise(
+    hisp_men_avg_diff = gender_wage_gap$hispanic_men_average[1] - gender_wage_gap$hispanic_men_average[50],
+    hisp_women_avg_diff = gender_wage_gap$hispanic_women_average[1] - gender_wage_gap$hispanic_women_average[50],
+    hispmw_avg_2022 = gender_wage_gap$hispanic_men_average[1] - gender_wage_gap$hispanic_women_average[1],
+    hispmw_avg_1973 = gender_wage_gap$hispanic_men_average[50] - gender_wage_gap$hispanic_women_average[50],
+    hwomenvsmen2022 = gender_wage_gap$hispanic_women_average[1] - gender_wage_gap$men_average[1],
+    hwomenvswomen2022 = gender_wage_gap$hispanic_women_average[1] - gender_wage_gap$women_average[1])
 
 ```
 
 To determine how age might factor into the gender pay gap, I cleaned up a data frame from the U.S.
 Bureau of Labor Statistics showing the inflation-adjusted median of usual weekly earnings, by age groups, for full-time wage and salary workers between 1979 and 2020.
-The original data can be found on table 17 of the Sept. 2021 report from the BLS (<https://www.bls.gov/opub/reports/womens-earnings/2020/home.html>).
+The original data can be found on table 17 of the Sept. 2021 BLS report (<https://www.bls.gov/opub/reports/womens-earnings/2020/home.html>).
 
 ```{r}
 
 median_weekly_earnings_age <- read_csv("data/median_weekly_earnings_age.csv") |>
 clean_names()
 
-view(median_weekly_earnings_age)
+median_weekly_earnings_age$men_total <- rowSums(median_weekly_earnings_age[, c("men_16_to_19_years", "men_20_to_24_years", "men_25_to_34_years", "men_35_to_44_years", "men_45_to_54_years", "men_55_to_64_years", "men_65_years_and_older")])
+
+median_weekly_earnings_age$women_total <- rowSums(median_weekly_earnings_age[, c("women_16_to_19_years", "women_20_to_24_years", "women_25_to_34_years", "women_35_to_44_years", "women_45_to_54_years", "women_55_to_64_years", "women_65_years_and_older")])
+
+write_csv(median_weekly_earnings_age, "median_weekly_earnings_age.csv")
+
+```
+
+```{r}
+
+  
 
 
 ```
