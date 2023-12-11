@@ -42,6 +42,8 @@ library(refinr)
 library(dplyr)
 library(ggthemes)
 library(ggplot2)
+library(corrr)
+
 ```
 
 ***1. How does the gender pay disparity vary by race, age and education?***
@@ -52,6 +54,7 @@ For the purposes of this project, I'm only focusing on male and female genders.
 ```{r}
 
 gender_wage_gap <- read_csv("data/gender_wage_gap.csv")
+view(gender_wage_gap)
 
 ```
 
@@ -168,15 +171,49 @@ median_weekly_earnings_age <- write_csv(median_weekly_earnings_age, "data/median
 ```
 The final step of this first question examines how the level of education completed might impact wage earnings.
 
-I plan on using a BLS dataset that encompasses inflation-adjusted median usual weekly earnings, by educational attainment, for full-time wage and salary workers 25 years and older between 1979 and 2020. I'm in the process of cleaning this data, but the original data can be found in table 19 of the Sept. 2021 BLS report (<https://www.bls.gov/opub/reports/womens-earnings/2020/home.html>).
+I plan on using a BLS dataset that encompasses inflation-adjusted median usual weekly earnings, by educational attainment, for full-time wage and salary workers 25 years and older between 1979 and 2020. I'm in the process of cleaning this data, but the original data can be found in table 19 of the Sept. 2021 BLS report (<https://www.bls.gov/opub/reports/womens-earnings/2020/#table-19>).
 
-My goal for this section is to determine how greater educational attainment among women might impact wages in comparison to men. According to the BLS, "the educational attainment of women ages 25 to 64 in the labor force has risen substantially over the past half century," and in 2019, "45 percent of women ages 25 to 64 held a bachelor’s degree and higher, compared with 11 percent in 1970." I'm hoping to merge this dataset with another that accounts for graduate and doctorate degree's, as I feel that information is important to include given those degrees typically lead to higher salaries.
+My goal for this section is to determine how greater educational attainment among women might impact wages in comparison to men. According to the BLS, "the educational attainment of women ages 25 to 64 in the labor force has risen substantially over the past half century," and in 2019, "45 percent of women ages 25 to 64 held a bachelor’s degree and higher, compared with 11 percent in 1970." 
 
 ```{r}
 
+men_education <- read_csv("data/men_education.csv")
+women_education <- read_csv("data/women_education.csv")
+
+```
+
+```{r}
+
+women_education <- women_education |>
+  setNames(c("year", "w_25_plus", "w_no_hs_diploma", "w_hs_no_college", "w_some_college", "w_bach_degree_plus"))
+
+men_education <- men_education |>
+  setNames(c("year", "m_25_plus", "m_no_hs_diploma", "m_hs_no_college", "m_some_college", "m_bach_degree_plus"))
+
+education <- merge(men_education, women_education, by = "year", all.x = TRUE)
+write_csv(employment_status, "data/employment_status.csv")
+
+```
+
+```{r}
+
+education <- merge(men_education, women_education, by = "year", all.x = TRUE)
+write_csv(education, "data/education.csv")
+
+```
+
+Using the education dataset that I've created, I visualized the data into two distinct line charts: One specifically for higher education degrees (https://datawrapper.dwcdn.net/kgZUX/1/) and the other for all other levels of education (https://datawrapper.dwcdn.net/HHcz6/1/). 
+
+```{r}
+
+education |>
+  ggplot() +
+  geom_point(aes(x=m_25_plus,y=w_25_plus)) +
+  geom_smooth(aes(x=m_25_plus,y=w_25_plus), method="lm")
 
 
 ```
+
 
 ***2. Which industries have the most and least significant wage discrepancies?***
 
@@ -205,14 +242,33 @@ write_csv(industry_gaps, "data/industry_gaps.csv")
 
 To answer this question, I am calling in data from the BLS' Labor Force Statistics from the Current Population Survey which provides the employment status of the civilian non-institutional population that is 16 years and over, by sex, starting in 1982. I am in the process of cleaning this data to import it into RStudio, but the original data can be found here (https://www.bls.gov/cps/cpsaat02.htm).
 
-My goal for this section is to identify workforce participation rates to debunk a commonly held theory that women earn less due to lower workforce participation rates. The BLS notes that the COVID-19 pandemic forced many women out of the workforce entirely due to layoffs and lack of child care. IN Feb. 2021, women’s labor force participation rate was 55.8% – the same rate as April 1987. However, since then women are returning to work at a higher rate than men thanks to remote and flexible work options.
+My goal for this section is to identify workforce participation rates to debunk a commonly held theory that women earn less due to lower workforce participation rates. The BLS notes that the COVID-19 pandemic forced many women out of the workforce entirely due to layoffs and lack of child care. In Feb. 2021, women’s labor force participation rate was 55.8% – the same rate as April 1987. However, since then women are returning to work at a higher rate than men thanks to remote and flexible work options.
 
 ```{r}
 
-
-
+men_employment_status <- read_csv("data/men_employment_status.csv")
+women_employment_status <- read_csv("data/women_employment_status.csv")
 
 ```
+
+```{r}
+
+men_employment_status <- men_employment_status |>
+  setNames(c("year", "m_civilian_population", "m_total", "m_percent_population", "m_total_employed", "m_pct_pop_employed","m_total_unemployed","m_pct_unemployed","m_not_in_labor_force"))
+
+women_employment_status <- women_employment_status |>
+  setNames(c("year", "w_civilian_population", "w_total", "w_percent_population", "w_total_employed", "w_pct_pop_employed","w_total_unemployed","w_pct_unemployed","w_not_in_labor_force"))
+
+```
+
+```{r}
+
+employment_status <- merge(men_employment_status, women_employment_status, by = "year", all.x = TRUE)
+
+write_csv(employment_status, "data/employment_status.csv")
+
+```
+
 
 
 
