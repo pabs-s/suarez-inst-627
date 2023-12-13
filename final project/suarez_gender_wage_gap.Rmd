@@ -149,7 +149,7 @@ gender_wage_gap |>
 
 To determine how age might factor into the gender pay gap, I cleaned up in Excel a data frame from the U.S.
 Bureau of Labor Statistics showing the inflation-adjusted median of usual weekly earnings, by age groups, for full-time wage and salary workers between 1979 and 2020.
-The original data can be found on table 17 of the Sept. 2021 BLS report (<https://www.bls.gov/opub/reports/womens-earnings/2020/home.html>).
+The original data can be found on table 17 of the Sept. 2021 BLS report (<https://www.bls.gov/opub/reports/womens-earnings/2020/>).
 
 This data, in its entirety, is difficult to visualize given all of the different datapoints across age groups and years. However, according to the BLS, workers earn the most when they are between the ages of 35 and 54. Therefore, I focused my visualization efforts on any age groups that fell within 35 to 54 years.
 
