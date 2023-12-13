@@ -275,16 +275,16 @@ mean_employed_pct_diff
 
 ```{r}
 
-#don't run this codeblock until you've called merged data from the next section
+#don't run this codeblock until you've called in merged_data from the next section
 merged_data |>
  mutate(pct_diff_median_wages = (weekly_women_median - weekly_men_median) / (weekly_men_median) * 100) |>
   summarize(mean_pct_diff = mean(pct_diff_median_wages, na.rm = TRUE))
   
 ```
 
-***4. Regression Analyses***
+***4. Further Analysis***
 
-In this section of the project I merged some of the dataframes I created earlier in the project to be able to conduct regression analyses of the different variables isolated in the questions above. Given that the year column in each dataframe starts and ends with different years, I used the reduce and intersect functions to merge them based on the same starting and ending year, which is from 1982 to 2020. One shortcoming to this approach is that I miss out on a few years post-Covid, but this was the most practical method to joining the various dataframes.
+In this section of the project I merged some of the dataframes I created earlier in the project to be able to analyze the different variables isolated in the questions above. Given that the year column in each dataframe starts and ends with different years, I used the reduce and intersect functions to merge them based on the same starting and ending year, which is from 1982 to 2020. One shortcoming to this approach is that I miss out on a few years post-Covid, but this was the most practical method to joining the various dataframes.
 
 Then I subset each dataset to include only the common years, followed by the merging process which uses the year column from each subset. Finally, I sorted the new merged dataset by year in ascending order. Although this worked, I still wasn't done. In order to conduct a proper regression analysis, I needed to convert the hourly wages into weekly wages.
 
@@ -292,26 +292,20 @@ Then I subset each dataset to include only the common years, followed by the mer
 
 common_years <- Reduce(intersect, list(gender_wage_gap$year, education$year, employment_status$year))
 
-# Subset each dataset to include only the common years
 subset_df1 <- gender_wage_gap[gender_wage_gap$year %in% common_years, ]
 subset_df2 <- education[education$year %in% common_years, ]
 subset_df3 <- employment_status[employment_status$year %in% common_years, ]
 
-# Merge datasets based on the "year" variable
 merged_data <- merge(merge(subset_df1, subset_df2, by = "year", all = TRUE), subset_df3, by = "year", all = TRUE)
 
-# Sort the merged dataset by "year"
 merged_data <- merged_data[order(merged_data$year), ]
 
 head(merged_data)
 
 ```
 
-I took each column from my merged dataset representing hourly median wages and created a for loop to convert them to a weekly median salary (assuming a 40-hour workweek).
-
 ```{r}
 
-# Columns to transform
 columns_to_transform <- c(
   'men_median', 'women_median',
   'white_men_median', 'white_women_median',
@@ -319,12 +313,10 @@ columns_to_transform <- c(
   'hispanic_men_median', 'hispanic_women_median'
 )
 
-# Create new columns with standardized values in merged_data
 for (col in columns_to_transform) {
   merged_data[[paste0('weekly_', col)]] <- merged_data[[col]] * 40 
 }
 
-# Print the resulting dataframe
 print(merged_data)
 
 ```
@@ -348,21 +340,35 @@ merged_data |>
 
 ```
 
-
-
-
 ```{r}
 
-subset_data_2020 <- merged_data[merged_data$year == 2020, ]
+merged_data |>
+  ggplot() +
+  geom_point(aes(x=weekly_women_median,y=weekly_men_median)) +
+  geom_smooth(aes(x=weekly_women_median,y=weekly_men_median), method="lm")
 
 ```
 
+Two Sample t-tests:
+
+This test examined men's median weekly income and women's median income with a bachelor's degree or greater. The p-value is so low, nearly zero, indicating that the observed difference in median weekly salaries is probably not due to random chance. The 95% confidence interval suggests that the median weekly salary for males is significantly lower than that for women with bachelor's degrees or greater. 
 
 
 ```{r}
 
 t.test(merged_data$weekly_men_median, merged_data$w_bach_degree_plus, conf.level = 0.95)
 
+```
+
+```{r}
+
+t.test(merged_data$weekly_men_median, merged_data$weekly_women_median, conf.level = 0.95)
+
+```
+
+```{r}
+
+t.test(merged_data$m_25_plus, merged_data$w_25_plus, conf.level = 0.95)
 
 ```
 
@@ -370,6 +376,4 @@ t.test(merged_data$weekly_men_median, merged_data$w_bach_degree_plus, conf.level
 
 
 
-
-Other factors that can be taken into consideration should I continue working on this project are the number of years of relevant work experience, geographic location and cost of living, and marital status.
 
